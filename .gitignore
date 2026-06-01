@@ -1,0 +1,23 @@
+# n8n local files
+.n8n/
+database.sqlite
+database.sqlite-shm
+database.sqlite-wal
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
