@@ -1,0 +1,235 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "87e71454-1253-4050-8d16-d6f3e528f4e8",
+      "name": "ERROR_GLOBAL_TRIGGER"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35a26e80-f69b-4256-9417-86ce3d498c80",
+              "name": "execution_id",
+              "value": "=={{$json.execution?.id || $json.executionId || $execution.id || 'unknown_execution_id'}}",
+              "type": "string"
+            },
+            {
+              "id": "4af90694-b233-4de4-a254-b12697f3c12d",
+              "name": "error_date",
+              "value": "=={{$now.toISO()}}",
+              "type": "string"
+            },
+            {
+              "id": "80b779e3-c2e3-417d-9d0e-67cbba9aa66e",
+              "name": "workflow_name",
+              "value": "=={{$json.workflow?.name || $json.workflowName || 'unknown_workflow'}}",
+              "type": "string"
+            },
+            {
+              "id": "1dec4d2b-9b2d-4866-bf3a-5bed853ec6ca",
+              "name": "node_name",
+              "value": "=={{$json.execution?.lastNodeExecuted || $json.node?.name || $json.lastNodeExecuted || 'unknown_node'}}",
+              "type": "string"
+            },
+            {
+              "id": "3eece51e-d361-47d4-9d42-75dc52d543ab",
+              "name": "error_message",
+              "value": "=={{$json.error?.message || $json.message || 'Erro sem mensagem disponível'}}",
+              "type": "string"
+            },
+            {
+              "id": "f14904f8-a726-46e3-aabc-dfabc75d72ff",
+              "name": "raw_error",
+              "value": "=={{JSON.stringify($json)}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "94495e21-e9b0-4a44-be7d-6c232ae923a2",
+      "name": "FORMAT_ERROR_PAYLOAD"
+    },
+    {
+      "parameters": {
+        "sendTo": "paulavasconcelos@gmail.com",
+        "subject": "=[PORTFÓLIO n8n] Erro no workflow - {{$json.workflow_name}}",
+        "message": "=Olá,\n\nFoi identificado um erro em um workflow do projeto Monitor Diário de Clima.\n\nWorkflow:\n{{$json.workflow_name}}\n\nNode provável:\n{{$json.node_name}}\n\nMensagem do erro:\n{{$json.error_message}}\n\nID da execução:\n{{$json.execution_id}}\n\nData do erro:\n{{$json.error_date}}\n\nO erro também foi registrado na aba error_logs da planilha portfolio_n8n_weather_monitor.\n\nEste e-mail foi gerado automaticamente pelo workflow global de tratamento de erros do n8n.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "10dba5a2-bf5b-4f75-87cf-4644120e8b6d",
+      "name": "GMAIL_SEND_ERROR_ALERT",
+      "webhookId": "9ea24000-2d00-4f2a-9bd2-9468ea77b5d5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2mwAHzoIqKxb4PeX",
+          "name": "GMAIL_SEND_WEATHER_ALERT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4",
+          "mode": "list",
+          "cachedResultName": "portfolio_n8n_weather_monitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1954686704,
+          "mode": "list",
+          "cachedResultName": "error_logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4/edit#gid=1954686704"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{ $json.execution_id }}",
+            "error_date": "={{ $json.error_date }}",
+            "workflow_name": "={{ $json.workflow_name }}",
+            "node_name": "={{ $json.node_name }}",
+            "error_message": "={{ $json.error_message }}",
+            "raw_error": "={{ $json.raw_error }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "error_date",
+              "displayName": "error_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow_name",
+              "displayName": "workflow_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "node_name",
+              "displayName": "node_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "error_message",
+              "displayName": "error_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "raw_error",
+              "displayName": "raw_error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "f99dff0b-e15c-431c-9e03-60fcdb44f10e",
+      "name": "GSHEETS_APPEND_ERROR_LOG",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EHiWWYKZQ7mi5az6",
+          "name": "weather_Google Sheets"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "ERROR_GLOBAL_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "FORMAT_ERROR_PAYLOAD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FORMAT_ERROR_PAYLOAD": {
+      "main": [
+        [
+          {
+            "node": "GSHEETS_APPEND_ERROR_LOG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GSHEETS_APPEND_ERROR_LOG": {
+      "main": [
+        [
+          {
+            "node": "GMAIL_SEND_ERROR_ALERT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f99e8047b722b9b9f4456d410e9b879bc04e5ad1896dd709e35e58368243da44"
+  }
+}

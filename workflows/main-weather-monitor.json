@@ -1,0 +1,631 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 17,
+              "triggerAtMinute": 30
+            },
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        0
+      ],
+      "id": "f3d47cf6-ee1f-4905-b4ff-e1cb42f000e8",
+      "name": "SCHEDULE_DAILY_WEATHER_CHECK"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f89f34ec-de14-4489-9724-1e1cab45b0cf",
+              "name": "city",
+              "value": "Recife",
+              "type": "string"
+            },
+            {
+              "id": "e71508ef-8b3a-47a7-b54b-234fbc149036",
+              "name": "latitude",
+              "value": -8.05,
+              "type": "number"
+            },
+            {
+              "id": "03b28a4d-9ce9-4ce1-96c9-1911215cfd4d",
+              "name": "longitude",
+              "value": -34.9,
+              "type": "number"
+            },
+            {
+              "id": "f2dd9d7c-df80-4064-9460-532e9816ee82",
+              "name": "timezone",
+              "value": "America/Recife",
+              "type": "string"
+            },
+            {
+              "id": "3e1b58ad-e8ee-414a-824a-b8ccc5f7adf0",
+              "name": "alert_temperature_limit",
+              "value": 30,
+              "type": "number"
+            },
+            {
+              "id": "3fd6f344-d341-4d26-8dcb-1335e9952bf8",
+              "name": "alert_rain_probability_limit",
+              "value": 60,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        0
+      ],
+      "id": "9b91badd-a8b2-4750-ae2a-edb47565bf93",
+      "name": "SET_CITY_COORDINATES"
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "={{ $json.latitude }}"
+            },
+            {
+              "name": "longitude",
+              "value": "={{ $json.longitude }}"
+            },
+            {
+              "name": "daily",
+              "value": "temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max"
+            },
+            {
+              "name": "timezone",
+              "value": "={{ $json.timezone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        272,
+        0
+      ],
+      "id": "14955398-4d70-410c-896c-b8bd8e69817e",
+      "name": "API_GET_WEATHER_FORECAST"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "32377712-ecc2-414e-84ea-02aea4408cd2",
+              "name": "execution_id",
+              "value": "={{$execution.id}}",
+              "type": "string"
+            },
+            {
+              "id": "992eb66c-1fef-4167-8813-7618ff61da6b",
+              "name": "execution_date",
+              "value": "={{$now.toISO()}}",
+              "type": "string"
+            },
+            {
+              "id": "86d858c4-56d6-4c20-90c6-093d178b64f7",
+              "name": "workflow_name",
+              "value": "PORTFOLIO_Weather_Monitor_Main",
+              "type": "string"
+            },
+            {
+              "id": "fd9cbdc9-ca71-4951-937d-313c6bd6e990",
+              "name": "city",
+              "value": "={{ $('SET_CITY_COORDINATES').item.json.city }}",
+              "type": "string"
+            },
+            {
+              "id": "f5a2df25-9b88-4e15-b5bb-c5ce8b9b1f45",
+              "name": "latitude",
+              "value": "={{ $('SET_CITY_COORDINATES').item.json.latitude }}",
+              "type": "number"
+            },
+            {
+              "id": "00d605ea-ab2e-4460-8d4b-92d0920cd2d4",
+              "name": "longitude",
+              "value": "={{ $('SET_CITY_COORDINATES').item.json.longitude }}",
+              "type": "number"
+            },
+            {
+              "id": "5a6186f0-d914-4059-8fc2-ab93ab82eb74",
+              "name": "timezone",
+              "value": "={{ $('SET_CITY_COORDINATES').item.json.timezone }}",
+              "type": "string"
+            },
+            {
+              "id": "10541349-031e-4aa1-a03a-373cfe7d2840",
+              "name": "alert_temperature_limit",
+              "value": "={{ $('SET_CITY_COORDINATES').item.json.alert_temperature_limit }}",
+              "type": "number"
+            },
+            {
+              "id": "15bf18bd-20f6-4ae9-9b67-02f67a880893",
+              "name": "alert_rain_probability_limit",
+              "value": "={{ $('SET_CITY_COORDINATES').item.json.alert_rain_probability_limit }}",
+              "type": "number"
+            },
+            {
+              "id": "a807a8ea-d6b8-44c5-b24c-e9c711e616b8",
+              "name": "temperature_min",
+              "value": "={{$json.daily.temperature_2m_min[0]}}",
+              "type": "number"
+            },
+            {
+              "id": "5bedfbfe-4482-43d8-be0c-fb9279112a78",
+              "name": "temperature_max",
+              "value": "={{$json.daily.temperature_2m_max[0]}}",
+              "type": "number"
+            },
+            {
+              "id": "f4f69282-8789-45cd-9386-4c184082b18c",
+              "name": "precipitation_probability",
+              "value": "={{$json.daily.precipitation_probability_max[0]}}",
+              "type": "number"
+            },
+            {
+              "id": "5b9d34c4-b615-40b8-b0da-64761c864530",
+              "name": "windspeed_max",
+              "value": "={{$json.daily.windspeed_10m_max[0]}}",
+              "type": "string"
+            },
+            {
+              "id": "9b18cebb-c700-4cd9-863b-752a83d95e65",
+              "name": "alert_required",
+              "value": "={{$json.daily.temperature_2m_max[0] > $('SET_CITY_COORDINATES').item.json.alert_temperature_limit || $json.daily.precipitation_probability_max[0] > $('SET_CITY_COORDINATES').item.json.alert_rain_probability_limit}}",
+              "type": "boolean"
+            },
+            {
+              "id": "e246ecbb-4603-461d-a416-43c8a142d085",
+              "name": "alert_reason",
+              "value": "={{$json.daily.temperature_2m_max[0] > $('SET_CITY_COORDINATES').item.json.alert_temperature_limit && $json.daily.precipitation_probability_max[0] > $('SET_CITY_COORDINATES').item.json.alert_rain_probability_limit ? 'Temperatura máxima e probabilidade de chuva acima dos limites configurados.' : $json.daily.temperature_2m_max[0] > $('SET_CITY_COORDINATES').item.json.alert_temperature_limit ? 'Temperatura máxima acima do limite configurado.' : $json.daily.precipitation_probability_max[0] > $('SET_CITY_COORDINATES').item.json.alert_rain_probability_limit ? 'Probabilidade de chuva acima do limite configurado.' : 'Nenhuma condição de alerta identificada.'}}",
+              "type": "string"
+            },
+            {
+              "id": "e227ab1c-f593-4789-be07-6ccadb517990",
+              "name": "status",
+              "value": "success",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        0
+      ],
+      "id": "ec47672c-1889-4ab3-96b3-94ef4646bc7b",
+      "name": "FORMAT_WEATHER_DATA"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "62ec3f11-a158-4cb9-bcea-bfb39b6f3ccd",
+              "leftValue": "={{ $json.alert_required }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        0
+      ],
+      "id": "cebe7319-934b-438d-a016-b9695ebf4098",
+      "name": "IF_ALERT_CONDITION"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4",
+          "mode": "list",
+          "cachedResultName": "portfolio_n8n_weather_monitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "weather_logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{ $json.execution_id }}",
+            "execution_date": "={{ $json.execution_date }}",
+            "city": "={{ $json.city }}",
+            "latitude": "={{ $json.latitude }}",
+            "longitude": "={{ $json.longitude }}",
+            "temperature_min": "={{ $json.temperature_min }}",
+            "temperature_max": "={{ $json.temperature_max }}",
+            "precipitation_probability": "={{ $json.precipitation_probability }}",
+            "wind_speed_max": "={{ $json.windspeed_max }}",
+            "alert_required": "={{ $json.alert_required }}",
+            "alert_reason": "={{ $json.alert_reason }}",
+            "status": "={{ $json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "execution_date",
+              "displayName": "execution_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latitude",
+              "displayName": "latitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "longitude",
+              "displayName": "longitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "temperature_min",
+              "displayName": "temperature_min",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "temperature_max",
+              "displayName": "temperature_max",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "precipitation_probability",
+              "displayName": "precipitation_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "wind_speed_max",
+              "displayName": "wind_speed_max",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alert_required",
+              "displayName": "alert_required",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alert_reason",
+              "displayName": "alert_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1056,
+        16
+      ],
+      "id": "76f68516-e7a5-4fe9-b0a0-cdeb3613abdb",
+      "name": "GSHEETS_APPEND_WEATHER_LOG",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EHiWWYKZQ7mi5az6",
+          "name": "weather_Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4",
+          "mode": "list",
+          "cachedResultName": "portfolio_n8n_weather_monitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2139005384,
+          "mode": "list",
+          "cachedResultName": "execution_logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hmCR1Ypb9xTnAEDXUrBSnqhNWXx6WA8Z09Pf8chhoM4/edit#gid=2139005384"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{$('FORMAT_WEATHER_DATA').item.json.execution_id}}",
+            "execution_date": "={{$('FORMAT_WEATHER_DATA').item.json.execution_date}}",
+            "workflow_name": "={{$('FORMAT_WEATHER_DATA').item.json.workflow_name}}",
+            "status": "success",
+            "message": "={{$('FORMAT_WEATHER_DATA').item.json.alert_required ? 'Execução concluída com alerta climático.' : 'Execução concluída sem alerta climático.'}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "execution_date",
+              "displayName": "execution_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow_name",
+              "displayName": "workflow_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1248,
+        16
+      ],
+      "id": "e5e7265b-2eab-4c35-8234-71b305c02fd8",
+      "name": "LOG_EXECUTION_SUCCESS",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EHiWWYKZQ7mi5az6",
+          "name": "weather_Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "paulavasconcelos@gmail.com",
+        "subject": "=[PORTFÓLIO n8n] Alerta climático diário - {{$json.city}}",
+        "message": "=Olá,  Foi identificado um alerta climático para a cidade monitorada.  Cidade: {{$json.city}} Temperatura mínima: {{$json.temperature_min}}°C Temperatura máxima: {{$json.temperature_max}}°C Probabilidade de chuva: {{$json.precipitation_probability}}% Velocidade máxima do vento: {{$json.wind_speed_max}} km/h  Motivo do alerta: {{$json.alert_reason}}  ID da execução: {{$json.execution_id}}  Data da execução: {{$json.execution_date}}  Este e-mail foi gerado automaticamente por um workflow n8n.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        -96
+      ],
+      "id": "3e940448-0644-4ced-8879-e9ee663eeda8",
+      "name": "GMAIL_SEND_WEATHER_ALERT",
+      "webhookId": "8dfe6678-8eff-44ef-9578-8e8272f4e150",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2mwAHzoIqKxb4PeX",
+          "name": "GMAIL_SEND_WEATHER_ALERT"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "SCHEDULE_DAILY_WEATHER_CHECK": {
+      "main": [
+        [
+          {
+            "node": "SET_CITY_COORDINATES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SET_CITY_COORDINATES": {
+      "main": [
+        [
+          {
+            "node": "API_GET_WEATHER_FORECAST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API_GET_WEATHER_FORECAST": {
+      "main": [
+        [
+          {
+            "node": "FORMAT_WEATHER_DATA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FORMAT_WEATHER_DATA": {
+      "main": [
+        [
+          {
+            "node": "IF_ALERT_CONDITION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF_ALERT_CONDITION": {
+      "main": [
+        [
+          {
+            "node": "GMAIL_SEND_WEATHER_ALERT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GSHEETS_APPEND_WEATHER_LOG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GSHEETS_APPEND_WEATHER_LOG": {
+      "main": [
+        [
+          {
+            "node": "LOG_EXECUTION_SUCCESS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GMAIL_SEND_WEATHER_ALERT": {
+      "main": [
+        [
+          {
+            "node": "GSHEETS_APPEND_WEATHER_LOG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f99e8047b722b9b9f4456d410e9b879bc04e5ad1896dd709e35e58368243da44"
+  }
+}
